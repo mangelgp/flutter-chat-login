@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:realtime_chat_app/helpers/mostrar_alerta.dart';
 import 'package:realtime_chat_app/services/auth_service.dart';
+import 'package:realtime_chat_app/services/socket_service.dart';
 
 import 'package:realtime_chat_app/widgets/btn_azul.dart';
 import 'package:realtime_chat_app/widgets/custom_input.dart';
@@ -51,6 +52,7 @@ class __FormState extends State<_Form> {
   Widget build(BuildContext context) {
 
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
     final size = MediaQuery.of(context).size;
 
     return Container(
@@ -80,6 +82,7 @@ class __FormState extends State<_Form> {
               FocusScope.of(context).unfocus(); // eliminar el foco actual, cerrar teclado si esta abierto
               final login = await authService.login( emailController.text.trim(), passController.text.trim() );
               if (login) {
+                socketService.connect();
                 Navigator.pushReplacementNamed(context, 'users');
               } else {
                 mostrarAlerta(

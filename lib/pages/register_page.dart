@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:realtime_chat_app/helpers/mostrar_alerta.dart';
 import 'package:realtime_chat_app/services/auth_service.dart';
+import 'package:realtime_chat_app/services/socket_service.dart';
 import 'package:realtime_chat_app/widgets/btn_azul.dart';
 import 'package:realtime_chat_app/widgets/custom_input.dart';
 import 'package:realtime_chat_app/widgets/labels.dart';
@@ -59,6 +60,7 @@ class __FormState extends State<_Form> {
 
     final size = MediaQuery.of(context).size;
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
 
     return Container(
       margin: EdgeInsets.only(top: 40.0),
@@ -100,6 +102,7 @@ class __FormState extends State<_Form> {
                 password: passController.text.trim()
               );
               if (resp) {
+                socketService.connect();
                 Navigator.pushReplacementNamed(context, 'users');
               } else {
                 mostrarAlerta(
