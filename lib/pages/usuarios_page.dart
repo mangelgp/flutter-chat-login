@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'package:realtime_chat_app/models/usuario.dart';
+import 'package:realtime_chat_app/services/auth_service.dart';
 
 
 class UsuariosPage extends StatefulWidget {
@@ -18,18 +20,18 @@ class _UsuariosPageState extends State<UsuariosPage> {
   final usuarios = [
     Usuario(
       email: 'test1@test.com',
-      name: 'Maria',
+      nombre: 'Maria',
       online: false,
       uid: '1'
     ),
     Usuario(
       email: 'test2@test.com',
-      name: 'Juan',
+      nombre: 'Juan',
       online: true,
       uid: '2'
     ),Usuario(
       email: 'test3@test.com',
-      name: 'Jared',
+      nombre: 'Jared',
       online: true,
       uid: '3'
     )
@@ -37,13 +39,21 @@ class _UsuariosPageState extends State<UsuariosPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    final authService = Provider.of<AuthService>(context);
+    final usuario = authService.usuario;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text( 'Mi nombre', style: TextStyle(color: Colors.black87) ),
+        title: Text( usuario.nombre, style: TextStyle(color: Colors.black87) ),
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.exit_to_app, color: Colors.black87), 
-          onPressed: () {}
+          onPressed: () async {
+            // TODO: desconectarse del socket server
+            await authService.logout();
+            Navigator.pushReplacementNamed(context, 'login');
+          }
         ),
         actions: [
           Container(
@@ -76,11 +86,11 @@ class _UsuariosPageState extends State<UsuariosPage> {
 
   ListTile _userListTile(Usuario usuario) {
     return ListTile(
-        title: Text(usuario.name),
+        title: Text(usuario.nombre),
         subtitle: Text(usuario.email),
         leading: CircleAvatar(
           backgroundColor: Colors.blue[200],
-          child: Text(usuario.name.substring(0,2)),
+          child: Text(usuario.nombre.substring(0,2)),
         ),
         trailing: Container(
           width: 10.0,

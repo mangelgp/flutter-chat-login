@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:realtime_chat_app/helpers/mostrar_alerta.dart';
+import 'package:realtime_chat_app/services/auth_service.dart';
 import 'package:realtime_chat_app/widgets/btn_azul.dart';
 import 'package:realtime_chat_app/widgets/custom_input.dart';
 import 'package:realtime_chat_app/widgets/labels.dart';
@@ -44,9 +47,18 @@ class __FormState extends State<_Form> {
   final passController  = TextEditingController();
 
   @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     final size = MediaQuery.of(context).size;
+    final authService = Provider.of<AuthService>(context);
 
     return Container(
       margin: EdgeInsets.only(top: 40.0),
@@ -76,10 +88,26 @@ class __FormState extends State<_Form> {
           ),
 
           BtnAzul(
-            text: 'Ingresar',
-            press: () {
+            text: 'Crear cuenta',
+            press: authService.autenticando ?
+            null : () async {
+              FocusScope.of(context).unfocus(); // eliminar el foco actual, cerrar teclado si esta abierto
               print(emailController.text);
               print(passController.text);
+              final resp = await authService.register(
+                nombre: nameController.text.trim(), 
+                email: emailController.text.trim(), 
+                password: passController.text.trim()
+              );
+              if (resp) {
+                Navigator.pushReplacementNamed(context, 'users');
+              } else {
+                mostrarAlerta(
+                  context: context,
+                  titulo: 'Imposible registrar',
+                  subtitulo: 'Porfavor verifique sus credenciales'
+                );
+              }
             },
           ) 
         ],

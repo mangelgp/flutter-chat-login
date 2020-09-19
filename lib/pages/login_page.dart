@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+import 'package:realtime_chat_app/helpers/mostrar_alerta.dart';
+import 'package:realtime_chat_app/services/auth_service.dart';
+
 import 'package:realtime_chat_app/widgets/btn_azul.dart';
 import 'package:realtime_chat_app/widgets/custom_input.dart';
 import 'package:realtime_chat_app/widgets/labels.dart';
@@ -45,6 +50,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
 
+    final authService = Provider.of<AuthService>(context);
     final size = MediaQuery.of(context).size;
 
     return Container(
@@ -69,10 +75,20 @@ class __FormState extends State<_Form> {
 
           BtnAzul(
             text: 'Ingresar',
-            press: () {
-              print(emailController.text);
-              print(passController.text);
-            },
+            press: authService.autenticando 
+            ? null : () async {
+              FocusScope.of(context).unfocus(); // eliminar el foco actual, cerrar teclado si esta abierto
+              final login = await authService.login( emailController.text.trim(), passController.text.trim() );
+              if (login) {
+                Navigator.pushReplacementNamed(context, 'users');
+              } else {
+                mostrarAlerta(
+                  context: context,
+                  titulo: 'Inicio de sesión incorrecto',
+                  subtitulo: 'Revise sus credenciales'
+                );
+              }
+            }
           ) 
         ],
       ),
